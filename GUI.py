@@ -5,39 +5,45 @@ import logic
 # custom Frame
 class AppFrame(wx.Frame):
     def __init__(
-            self, parent, ID, title, pos=wx.DefaultPosition,
-            size=wx.Size(500, 500), style=wx.DEFAULT_FRAME_STYLE
+            self, parent
     ):
-        wx.Frame.__init__(self, parent, ID, title, pos, size, style)
-        panel = wx.Panel(self, -1)  # frame gets a panel
-        vbox = wx.BoxSizer(orient=wx.VERTICAL)
-        displaytext = wx.StaticText(panel, label="Please enter a word:", pos=wx.Point(140, 50))
-        button = wx.Button(panel, 1003, "Search word")
-        button.SetPosition((150, 150))
+        wx.Frame.__init__(self, parent)
+
+        # frame gets a panel
+        panel = wx.Panel(self)
+        panel.SetBackgroundColour("purple")
+
+        displaytext = wx.StaticText(panel, label="Please enter a word:")
+        button = wx.Button(panel, label="Search word")
         self.Bind(wx.EVT_BUTTON, self.OnSearchWord, button)
         self.textbox = wx.TextCtrl(panel)
-        self.textbox.SetPosition(wx.Point(140, 100))
-        self.definition = wx.StaticText(panel, pos=wx.Point(50, 200))
-        self.definition.SetSize(wx.Size(300, 500))
-        self.definition.SetWindowStyle(wx.ST_NO_AUTORESIZE)
-        self.definition.Show(False)
-        menubar = wx.MenuBar()
-        menu = wx.Menu()
-        aboutitem = wx.MenuItem(menu, 5, text="About")
-        menu.Append(aboutitem)
-        helpitem = wx.MenuItem(menu, 6, text="Help")
-        menu.Append(helpitem)
-        menubar.Append(menu, "Menu")
-        self.Bind(wx.EVT_MENU, self.OpenAbout, aboutitem)
-        self.Bind(wx.EVT_MENU, self.OpenHelp, helpitem)
-        self.SetMenuBar(menubar)
+        self.definition = wx.StaticText(panel, size=(300,500), style=wx.ST_NO_AUTORESIZE)
 
-        # add all elements to sizer
-        vbox.Add(displaytext, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5)
-        vbox.Add(self.textbox, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5)
-        vbox.Add(button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5)
-        vbox.Add(self.definition, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5)
+        # organize panel items in a sizer box
+        vbox = wx.BoxSizer(orient=wx.VERTICAL)
+        vbox.Add(displaytext, flag=wx.ALIGN_CENTER)
+        vbox.Add(self.textbox, flag=wx.ALIGN_CENTER)
+        vbox.Add(button, flag=wx.ALIGN_CENTER)
+        vbox.Add(self.definition, flag=wx.ALIGN_CENTER | wx.RESERVE_SPACE_EVEN_IF_HIDDEN)
+        self.definition.Show(False)
         panel.SetSizer(vbox)
+
+        # add a menu bar
+        menu_bar = wx.MenuBar()
+        menu = wx.Menu()
+        about_item = wx.MenuItem(menu, 5, text="About")
+        menu.Append(about_item)
+        help_item = wx.MenuItem(menu, 6, text="Help")
+        menu.Append(help_item)
+        menu_bar.Append(menu, "Menu")
+        self.Bind(wx.EVT_MENU, self.OpenAbout, about_item)
+        self.Bind(wx.EVT_MENU, self.OpenHelp, help_item)
+        self.SetMenuBar(menu_bar)
+
+        panel.SetAutoLayout(True)
+        vbox.Fit(panel)
+        self.Center()
+        self.Show()
 
     def OnSearchWord(self, event):
         word = self.textbox.GetLineText(0)
