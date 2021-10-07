@@ -1,5 +1,6 @@
 import wx
 import logic
+from PIL import Image
 
 
 # custom Frame
@@ -12,38 +13,40 @@ class AppFrame(wx.Frame):
         self.SetFont(wx.Font(wx.FontInfo(10).FaceName("Lucida Sans Unicode")))
 
         # frame gets a panel
-        panel = wx.Panel(self)
-        panel.SetBackgroundColour((229, 204, 255, 255))
+        self.panel = wx.Panel(self)
+        self.panel.SetBackgroundColour((255, 204, 204, 255))
 
-        displaytext = wx.StaticText(panel, label="Please enter a word:")
-        button = wx.Button(panel, id=wx.ID_ANY, label="Search Word", pos=wx.DefaultPosition,
-                           size=wx.DefaultSize, style=wx.BORDER_NONE, validator=wx.DefaultValidator,
-                           name="button")
-        button.SetBackgroundColour((204, 0, 204, 255))
-        self.Bind(wx.EVT_BUTTON, self.OnSearchWord, button)
-        self.textbox = wx.TextCtrl(panel)
-        self.definition = wx.StaticText(panel, size=(300, 500), style=wx.ST_NO_AUTORESIZE)
+        displaytext = wx.StaticText(self.panel, label="Please enter a word:")
+        self.button = wx.Button(self.panel, id=wx.ID_ANY, label="Search Word", pos=wx.DefaultPosition,
+                                size=wx.DefaultSize, style=wx.BORDER_NONE, validator=wx.DefaultValidator,
+                                name="button")
+        self.button.SetBackgroundColour((255, 153, 153, 255))
+        self.Bind(wx.EVT_BUTTON, self.OnSearchWord, self.button)
+        self.textbox = wx.TextCtrl(self.panel, 1, "", wx.DefaultPosition,
+                                   wx.DefaultSize, wx.TE_PROCESS_ENTER, wx.DefaultValidator, "text")
+        self.Bind(wx.EVT_TEXT_ENTER, self.OnSearchWord, self.textbox)
+        self.definition = wx.StaticText(self.panel, size=(300, 500), style=wx.ST_NO_AUTORESIZE)
 
         # organize panel items in a sizer box
         vbox = wx.BoxSizer(orient=wx.VERTICAL)
         vbox.Add((0, 50), 0)
         vbox.Add(displaytext, flag=wx.ALIGN_CENTER)
-        vbox.AddSpacer(50)
+        vbox.AddSpacer(30)
         vbox.Add(self.textbox, flag=wx.ALIGN_CENTER)
-        vbox.AddSpacer(20)
-        vbox.Add(button, flag=wx.ALIGN_CENTER)
+        vbox.AddSpacer(30)
+        vbox.Add(self.button, flag=wx.ALIGN_CENTER)
         vbox.AddSpacer(50)
         vbox.Add(self.definition, flag=wx.ALIGN_CENTER | wx.RESERVE_SPACE_EVEN_IF_HIDDEN)
         vbox.AddStretchSpacer(prop=1)
         self.definition.Show(False)
-        panel.SetSizer(vbox)
+        self.panel.SetSizer(vbox)
 
         # add a menu bar
         menu_bar = wx.MenuBar()
         menu = wx.Menu()
         about_item = wx.MenuItem(menu, 5, text="About")
-        menu.Append(about_item)
         help_item = wx.MenuItem(menu, 6, text="Help")
+        menu.Append(about_item)
         menu.Append(help_item)
         menu_bar.Append(menu, "Menu")
         self.Bind(wx.EVT_MENU, self.OpenAbout, about_item)
@@ -51,14 +54,28 @@ class AppFrame(wx.Frame):
         self.SetMenuBar(menu_bar)
 
         # add a toolbar
-        toolbar = self.CreateToolBar(style=wx.TB_DEFAULT_STYLE, id=wx.ID_ANY, name="toolbar")
-        toolbar.SetBackgroundColour((204, 0, 204, 255))
-        # toolbar.AddTool(wx.ID_ANY, "Leaf", bitmap, shortHelp=””, kind = ITEM_NORMAL)
-        # toolbar.AddTool(wx.ID_ANY, "Sunflower", bitmap, shortHelp=””, kind = ITEM_NORMAL)
-        # toolbar.AddTool(wx.ID_ANY, "Tulip", bitmap, shortHelp=””, kind = ITEM_NORMAL)
+        self.toolbar = self.CreateToolBar(style=wx.TB_DEFAULT_STYLE, id=wx.ID_ANY, name="toolbar")
+        self.toolbar.SetBackgroundColour((255, 153, 153, 255))
+        # add radio buttons for color theme
+        redtool = self.toolbar.AddRadioTool(1, "Red", wx.Bitmap('icons/red.png'),
+                                            bmpDisabled=wx.NullBitmap, shortHelp="",
+                                            longHelp="", clientData=None)
+        greentool = self.toolbar.AddRadioTool(2, "Green", wx.Bitmap('icons/green.png'),
+                                              bmpDisabled=wx.NullBitmap, shortHelp="",
+                                              longHelp="", clientData=None)
+        purpletool = self.toolbar.AddRadioTool(3, "Purple", wx.Bitmap('icons/purple.png'),
+                                               bmpDisabled=wx.NullBitmap,
+                                               shortHelp="", longHelp="", clientData=None)
+        # add functionality for radio buttons
+        self.Bind(wx.EVT_TOOL, self.ChangeThemeRed, redtool)
+        self.Bind(wx.EVT_TOOL, self.ChangeThemeGreen, greentool)
+        self.Bind(wx.EVT_TOOL, self.ChangeThemePurple, purpletool)
 
-        panel.SetAutoLayout(True)
-        vbox.Fit(panel)
+        # realize toolbar
+        self.toolbar.Realize()
+
+        self.panel.SetAutoLayout(True)
+        vbox.Fit(self.panel)
         self.Center()
         self.Show()
 
@@ -77,3 +94,27 @@ class AppFrame(wx.Frame):
     def OpenHelp(self, event):
         wx.MessageBox('Enter a word and press Search word to look up its definition.',
                       'Help', style=wx.OK | wx.CLOSE | wx.CENTRE, parent=self)
+
+    def ChangeThemeRed(self, event):
+        print("red")
+        self.panel.SetBackgroundColour((255, 204, 204, 255))
+        self.button.SetBackgroundColour((255, 153, 153, 255))
+        self.toolbar.SetBackgroundColour((255, 153, 153, 255))
+        self.Refresh()
+        self.toolbar.Realize()
+
+    def ChangeThemeGreen(self, event):
+        print("green")
+        self.panel.SetBackgroundColour((204, 255, 229, 255))
+        self.button.SetBackgroundColour((102, 255, 178, 255))
+        self.toolbar.SetBackgroundColour((102, 255, 178, 255))
+        self.Refresh()
+        self.toolbar.Realize()
+
+    def ChangeThemePurple(self, event):
+        print("purple")
+        self.panel.SetBackgroundColour((229, 204, 255, 255))
+        self.button.SetBackgroundColour((204, 153, 255, 255))
+        self.toolbar.SetBackgroundColour((204, 153, 255, 255))
+        self.Refresh()
+        self.toolbar.Realize()
