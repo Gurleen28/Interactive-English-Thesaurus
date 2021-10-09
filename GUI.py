@@ -81,10 +81,8 @@ class AppFrame(wx.Frame):
 
     def OnSearchWord(self, event):
         word = self.textbox.GetLineText(0)
-        print(word)
-        definition = str(logic.searchWord(word))
-        print(definition)
-        self.definition.SetLabel(definition)
+        definitions = logic.searchWord(word, self)
+        self.definition.SetLabel(str(definitions))
         self.definition.Show(True)
 
     def OpenAbout(self, event):
@@ -118,3 +116,39 @@ class AppFrame(wx.Frame):
         self.toolbar.SetBackgroundColour((204, 153, 255, 255))
         self.Refresh()
         self.toolbar.Realize()
+
+
+class ChoiceDialog(wx.Dialog):
+
+    def __init__(
+            self, parent, matches
+    ):
+        wx.Dialog.__init__(self, parent, id=5, title="Choose word", pos=wx.DefaultPosition, size=wx.Size(300, 150),
+                           style=wx.DEFAULT_DIALOG_STYLE, name="choose word dialog")
+
+        vbox = wx.BoxSizer(orient=wx.VERTICAL)
+        vbox.Add(wx.StaticText(self, 1, "Did you mean one of these words?", wx.DefaultPosition, wx.DefaultSize, 0,
+                               "text"))
+        self.SetSizer(vbox)
+        buttons = []
+        for i in range(0, len(matches)):
+            button = wx.RadioButton(self, 1, matches[i], wx.DefaultPosition,
+                                    wx.DefaultSize, 0, wx.DefaultValidator,
+                                    "button")
+            buttons.append(button)
+            vbox.Add(button)
+        okbutton = wx.Button(self, 5, "Ok", wx.DefaultPosition, wx.DefaultSize, 0,
+                             wx.DefaultValidator, "ok button")
+        self.Bind(wx.EVT_BUTTON, self.OnOk, okbutton)
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
+        vbox.Add(okbutton, flag=wx.ALIGN_CENTRE)
+        self.Centre()
+        self.Show()
+
+    def OnOk(self, event):
+        # logic.searchWord()
+        print("ok")
+
+    def OnClose(self, event):
+        self.GetParent().definition.SetLabel("No word found.")
+        self.Destroy()
