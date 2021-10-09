@@ -9,6 +9,7 @@ class AppFrame(wx.Frame):
             self, parent
     ):
         wx.Frame.__init__(self, parent)
+        self.SetSize(500,500)
         self.SetTitle("Interactive English Thesaurus")
         self.SetFont(wx.Font(wx.FontInfo(10).FaceName("Lucida Sans Unicode")))
 
@@ -130,12 +131,13 @@ class ChoiceDialog(wx.Dialog):
         vbox.Add(wx.StaticText(self, 1, "Did you mean one of these words?", wx.DefaultPosition, wx.DefaultSize, 0,
                                "text"))
         self.SetSizer(vbox)
-        buttons = []
+        self.buttons = []
+        self.matches = matches
         for i in range(0, len(matches)):
             button = wx.RadioButton(self, 1, matches[i], wx.DefaultPosition,
                                     wx.DefaultSize, 0, wx.DefaultValidator,
                                     "button")
-            buttons.append(button)
+            self.buttons.append(button)
             vbox.Add(button)
         okbutton = wx.Button(self, 5, "Ok", wx.DefaultPosition, wx.DefaultSize, 0,
                              wx.DefaultValidator, "ok button")
@@ -146,8 +148,11 @@ class ChoiceDialog(wx.Dialog):
         self.Show()
 
     def OnOk(self, event):
-        # logic.searchWord()
-        print("ok")
+        for i in range(0, len(self.buttons)):
+            if self.buttons[i].GetValue():
+                definition = logic.searchWord(self.matches[i], self.GetParent())
+                self.GetParent().definition.SetLabel(str(definition))
+        self.Destroy()
 
     def OnClose(self, event):
         self.GetParent().definition.SetLabel("No word found.")
