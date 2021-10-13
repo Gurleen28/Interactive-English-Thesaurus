@@ -5,6 +5,14 @@ from difflib import get_close_matches
 
 data = json.load(open("data.json"))
 
+def generateDictList(language):
+    if language == "english":
+        engDict = []
+        for k, v in data.items():
+            for i in range(0, len(v)):
+                engDict.append((k, v[i]))
+    return engDict
+
 
 def searchWord(word, frame):
     if word.lower() in data:             # most words in database are lowercase

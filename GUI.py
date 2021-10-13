@@ -10,7 +10,7 @@ class AppFrame(wx.Frame):
     ):
         wx.Frame.__init__(self, parent)
         self.SetSize(500, 500)
-        self.SetTitle("Interactive English Thesaurus")
+        self.SetTitle("Interactive Dictionary")
         self.SetFont(wx.Font(wx.FontInfo(10).FaceName("Lucida Sans Unicode")))
 
         # frame gets a panel
@@ -129,6 +129,7 @@ class ChoiceDialog(wx.Dialog):
         wx.Dialog.__init__(self, parent, id=5, title="Choose word", pos=wx.DefaultPosition, size=wx.Size(300, 150),
                            style=wx.DEFAULT_DIALOG_STYLE, name="choose word dialog")
 
+        self.SetFont(wx.Font(wx.FontInfo(10).FaceName("Lucida Sans Unicode")))
         vbox = wx.BoxSizer(orient=wx.VERTICAL)
         vbox.Add(wx.StaticText(self, 1, "Did you mean one of these words?", wx.DefaultPosition, wx.DefaultSize, 0,
                                "text"))
