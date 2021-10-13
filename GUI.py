@@ -9,7 +9,7 @@ class AppFrame(wx.Frame):
             self, parent
     ):
         wx.Frame.__init__(self, parent)
-        self.SetSize(500,500)
+        self.SetSize(500, 500)
         self.SetTitle("Interactive English Thesaurus")
         self.SetFont(wx.Font(wx.FontInfo(10).FaceName("Lucida Sans Unicode")))
 
@@ -27,6 +27,7 @@ class AppFrame(wx.Frame):
                                    wx.DefaultSize, wx.TE_PROCESS_ENTER, wx.DefaultValidator, "text")
         self.Bind(wx.EVT_TEXT_ENTER, self.OnSearchWord, self.textbox)
         self.definition = wx.StaticText(self.panel, size=(300, 500), style=wx.ST_NO_AUTORESIZE)
+        self.theme = "red"
 
         # organize panel items in a sizer box
         vbox = wx.BoxSizer(orient=wx.VERTICAL)
@@ -57,6 +58,7 @@ class AppFrame(wx.Frame):
         # add a toolbar
         self.toolbar = self.CreateToolBar(style=wx.TB_DEFAULT_STYLE, id=wx.ID_ANY, name="toolbar")
         self.toolbar.SetBackgroundColour((255, 153, 153, 255))
+
         # add radio buttons for color theme
         redtool = self.toolbar.AddRadioTool(1, "Red", wx.Bitmap('icons/red.png'),
                                             bmpDisabled=wx.NullBitmap, shortHelp="",
@@ -95,7 +97,7 @@ class AppFrame(wx.Frame):
                       'Help', style=wx.OK | wx.CLOSE | wx.CENTRE, parent=self)
 
     def ChangeThemeRed(self, event):
-        print("red")
+        self.theme = "red"
         self.panel.SetBackgroundColour((255, 204, 204, 255))
         self.button.SetBackgroundColour((255, 153, 153, 255))
         self.toolbar.SetBackgroundColour((255, 153, 153, 255))
@@ -103,7 +105,7 @@ class AppFrame(wx.Frame):
         self.toolbar.Realize()
 
     def ChangeThemeGreen(self, event):
-        print("green")
+        self.theme = "green"
         self.panel.SetBackgroundColour((204, 255, 229, 255))
         self.button.SetBackgroundColour((102, 255, 178, 255))
         self.toolbar.SetBackgroundColour((102, 255, 178, 255))
@@ -111,7 +113,7 @@ class AppFrame(wx.Frame):
         self.toolbar.Realize()
 
     def ChangeThemePurple(self, event):
-        print("purple")
+        self.theme = "purple"
         self.panel.SetBackgroundColour((229, 204, 255, 255))
         self.button.SetBackgroundColour((204, 153, 255, 255))
         self.toolbar.SetBackgroundColour((204, 153, 255, 255))
@@ -139,11 +141,23 @@ class ChoiceDialog(wx.Dialog):
                                     "button")
             self.buttons.append(button)
             vbox.Add(button)
-        okbutton = wx.Button(self, 5, "Ok", wx.DefaultPosition, wx.DefaultSize, 0,
+        okbutton = wx.Button(self, 5, "Ok", wx.DefaultPosition, wx.DefaultSize, wx.BORDER_NONE,
                              wx.DefaultValidator, "ok button")
         self.Bind(wx.EVT_BUTTON, self.OnOk, okbutton)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         vbox.Add(okbutton, flag=wx.ALIGN_CENTRE)
+
+        # change color based on theme
+        if self.GetParent().theme == "red":
+            self.SetBackgroundColour((255, 204, 204, 255))
+            okbutton.SetBackgroundColour((255, 153, 153, 255))
+        elif self.GetParent().theme == "green":
+            self.SetBackgroundColour((204, 255, 229, 255))
+            okbutton.SetBackgroundColour((102, 255, 178, 255))
+        elif self.GetParent().theme == "purple":
+            self.SetBackgroundColour((229, 204, 255, 255))
+            okbutton.SetBackgroundColour((204, 153, 255, 255))
+
         self.Centre()
         self.Show()
 
@@ -152,6 +166,9 @@ class ChoiceDialog(wx.Dialog):
             if self.buttons[i].GetValue():
                 definition = logic.searchWord(self.matches[i], self.GetParent())
                 self.GetParent().definition.SetLabel(str(definition))
+                self.GetParent().textbox.Clear()
+                self.GetParent().textbox.SetInsertionPoint(0)
+                self.GetParent().textbox.WriteText(self.matches[i])
         self.Destroy()
 
     def OnClose(self, event):

@@ -19,6 +19,6 @@ def searchWord(word, frame):
     elif len(get_close_matches(word, data.keys(), n=3, cutoff=0.8)) > 0:
         matches = get_close_matches(word, data.keys(), n=3, cutoff=0.8)
         dialog = GUI.ChoiceDialog(frame, matches)
-        return get_close_matches(word, data.keys(), n=3, cutoff=0.8)
+        return ""
     else:
         return "Word not found."
