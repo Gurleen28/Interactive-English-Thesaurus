@@ -10,7 +10,7 @@ class Database:
         try:
             self.cur.execute("CREATE DATABASE dictDb;")
         except pg.errors.DuplicateDatabase:
-            print("Database exists already")
+            print("Database already exists")
         self.cur.execute("DROP TABLE IF EXISTS english")
         self.cur.execute("CREATE TABLE english (word TEXT, definition TEXT)")
 

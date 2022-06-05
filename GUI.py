@@ -11,6 +11,7 @@ class AppFrame(wx.Frame):
         self.SetSize(500, 500)
         self.SetTitle("Interactive Dictionary")
         self.SetFont(wx.Font(wx.FontInfo(10).FaceName("Lucida Sans Unicode")))
+        self.SetIcon(wx.Icon('icons/flag_icon.png'))
         self.logic = Logic()
 
         # frame gets a panel
@@ -88,6 +89,8 @@ class AppFrame(wx.Frame):
         if definitions:
             self.definition.SetLabel(str(definitions))
             self.definition.Show(True)
+            if definitions > 4:
+                self.Maximize()
         else:
             matches = self.logic.getCloseMatches(word)
             if not matches:
@@ -174,8 +177,10 @@ class ChoiceDialog(wx.Dialog):
     def OnOk(self, event):
         for i in range(0, len(self.buttons)):
             if self.buttons[i].GetValue():
-                definition = self.parent.logic.searchWord(self.matches[i])
-                self.GetParent().definition.SetLabel(str(definition))
+                definitions = self.parent.logic.searchWord(self.matches[i])
+                if definitions > 4:
+                    self.Maximize()
+                self.GetParent().definition.SetLabel(str(definitions))
                 self.GetParent().definition.Show(True)
                 self.GetParent().textbox.Clear()
                 self.GetParent().textbox.SetInsertionPoint(0)
