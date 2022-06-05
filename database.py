@@ -1,18 +1,37 @@
+# @author Gurleen Kour
+# Permission to copy and modify all files if author is credited
+# email: gurleenkour2800@gmail.com
+
+
 import psycopg2 as pg
+import psycopg2.errors as pge
 
 
 class Database:
-    def __init__(self):
-        self.conn = pg.connect(
-            "dbname='postgres' user='postgres' password='postgresgurleen' host='127.0.0.1' port='5432'")  # dictDb
-        self.conn.autocommit = True
-        self.cur = self.conn.cursor()
+
+    def setLoginData(self, username, password):
+        self.username = username
+        self.password = password
+
+    def setupDatabase(self, engDict):
+        try:
+            self.conn = pg.connect(
+                "dbname='postgres' user='" + self.username + "' password='" + self.password + "' host='127.0.0.1' port='5432'")
+            self.conn.autocommit = True
+            self.cur = self.conn.cursor()
+        except pge.OperationalError:
+            return False  # login unsuccessful
+
+        # create dictDb if there isn't one
         try:
             self.cur.execute("CREATE DATABASE dictDb;")
-        except pg.errors.DuplicateDatabase:
-            print("Database already exists")
-        self.cur.execute("DROP TABLE IF EXISTS english")
-        self.cur.execute("CREATE TABLE english (word TEXT, definition TEXT)")
+            self.cur.execute("DROP TABLE IF EXISTS english")
+            self.cur.execute("CREATE TABLE english (word TEXT, definition TEXT)")
+            self.insertElements("english", engDict)
+            print("New database dictDb created")
+        except pge.DuplicateDatabase:
+            print("Database dictdB already exists")
+        return True  # login successful
 
     # rows is a list containing tuples (word, definition)
     def insertElements(self, table, rows):

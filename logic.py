@@ -1,15 +1,23 @@
+# @author Gurleen Kour
+# Permission to copy and modify all files if author is credited
+# email: gurleenkour2800@gmail.com
+
 import json
+import os
 from database import Database
 from difflib import get_close_matches
 
-data = json.load(open("data\\english_to_english.json"))
+data = json.load(open(os. getcwd() + "\\data\\english_to_english.json"))
 
 
 class Logic:
     def __init__(self):
         self.database = Database()
+
+    def setupDatabase(self, username, password):
         engDict = generateDictLists()
-        self.database.insertElements("english", engDict)
+        self.database.setLoginData(username, password)
+        return self.database.setupDatabase(engDict)
 
     def searchWord(self, word):
         if self.database.getDefinitions(word.lower()):  # most words in database are lowercase
