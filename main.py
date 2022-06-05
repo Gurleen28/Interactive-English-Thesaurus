@@ -1,15 +1,8 @@
-import wx
-import GUI
-import logic
-import database
+from wx import App
+from GUI import AppFrame
 
-engDict = logic.generateDictLists()
-
-# database.createTable("english")
-# database.insertElements("english", engDict)
-
-app = wx.App()
-myFrame = GUI.AppFrame(None)
+app = App()
+myFrame = AppFrame(None)
 myFrame.Show()
 app.MainLoop()
 

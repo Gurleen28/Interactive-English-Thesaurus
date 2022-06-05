@@ -1,6 +1,5 @@
 import wx
-import logic
-from PIL import Image
+from logic import Logic
 
 
 # custom Frame
@@ -12,6 +11,7 @@ class AppFrame(wx.Frame):
         self.SetSize(500, 500)
         self.SetTitle("Interactive Dictionary")
         self.SetFont(wx.Font(wx.FontInfo(10).FaceName("Lucida Sans Unicode")))
+        self.logic = Logic()
 
         # frame gets a panel
         self.panel = wx.Panel(self)
@@ -84,9 +84,17 @@ class AppFrame(wx.Frame):
 
     def OnSearchWord(self, event):
         word = self.textbox.GetLineText(0)
-        definitions = logic.searchWord(word, self)
-        self.definition.SetLabel(str(definitions))
-        self.definition.Show(True)
+        definitions = self.logic.searchWord(word)
+        if definitions:
+            self.definition.SetLabel(str(definitions))
+            self.definition.Show(True)
+        else:
+            matches = self.logic.getCloseMatches(word)
+            if not matches:
+                self.definition.SetLabel("Word not found.")
+                self.definition.Show(True)
+            else:
+                ChoiceDialog(self, matches)
 
     def OpenAbout(self, event):
         wx.MessageBox('This program was created by Gurleen Kour.', 'About',
@@ -128,6 +136,7 @@ class ChoiceDialog(wx.Dialog):
     ):
         wx.Dialog.__init__(self, parent, id=5, title="Choose word", pos=wx.DefaultPosition, size=wx.Size(300, 150),
                            style=wx.DEFAULT_DIALOG_STYLE, name="choose word dialog")
+        self.parent = parent
 
         self.SetFont(wx.Font(wx.FontInfo(10).FaceName("Lucida Sans Unicode")))
         vbox = wx.BoxSizer(orient=wx.VERTICAL)
@@ -165,8 +174,9 @@ class ChoiceDialog(wx.Dialog):
     def OnOk(self, event):
         for i in range(0, len(self.buttons)):
             if self.buttons[i].GetValue():
-                definition = logic.searchWord(self.matches[i], self.GetParent())
+                definition = self.parent.logic.searchWord(self.matches[i])
                 self.GetParent().definition.SetLabel(str(definition))
+                self.GetParent().definition.Show(True)
                 self.GetParent().textbox.Clear()
                 self.GetParent().textbox.SetInsertionPoint(0)
                 self.GetParent().textbox.WriteText(self.matches[i])
