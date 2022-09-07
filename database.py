@@ -13,16 +13,17 @@ class Database:
         self.username = username
         self.password = password
 
-    def setupDatabase(self, engDict):
+    def connect_database(self):
         try:
             self.conn = pg.connect(
                 "dbname='postgres' user='" + self.username + "' password='" + self.password + "' host='127.0.0.1' port='5432'")
             self.conn.autocommit = True
             self.cur = self.conn.cursor()
+            return True
         except pge.OperationalError:
             return False  # login unsuccessful
 
-        # create dictDb if there isn't one
+    def create_database(self, engDict):
         try:
             self.cur.execute("CREATE DATABASE dictDb;")
             self.cur.execute("DROP TABLE IF EXISTS english")
@@ -31,7 +32,6 @@ class Database:
             print("New database dictDb created")
         except pge.DuplicateDatabase:
             print("Database dictdB already exists")
-        return True  # login successful
 
     # rows is a list containing tuples (word, definition)
     def insertElements(self, table, rows):
@@ -45,3 +45,8 @@ class Database:
         rows = self.cur.fetchall()
         definitions = [i[1] for i in rows]
         return definitions
+
+    def element_exists(self, word):
+        self.cur.execute("SELECT definition FROM english WHERE word = %s", (word,))
+        return self.cur.fetchone() is not None
+
