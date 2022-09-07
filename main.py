@@ -3,7 +3,7 @@
 # email: gurleenkour2800@gmail.com
 
 from wx import App
-from AppFrame import AppFrame
+from GUI.AppFrame import AppFrame
 
 app = App()
 myFrame = AppFrame(None)

@@ -5,8 +5,10 @@
 import os
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
+
+from GUI.LoginDialog import LoginDialog
 from logic import Logic
-import ChoiceDialog
+from GUI.ChoiceDialog import ChoiceDialog
 
 
 # custom Frame
@@ -88,7 +90,7 @@ class AppFrame(wx.Frame):
         self.toolbar.Realize()
         self.Center()
         self.Show()
-        ChoiceDialog.LoginDialog(self)
+        LoginDialog(self)
         self.logic = Logic()
 
     def OnSearchWord(self, event):
